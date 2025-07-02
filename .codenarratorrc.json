@@ -1,0 +1,7 @@
+{
+    "input": "./src",
+    "output": "./docs",
+    "model": "gemini",
+    "verbose": true
+  }
+  
