@@ -1,0 +1,33 @@
+{
+  "name": "codenarrator",
+  "version": "1.0.0",
+  "description": "> ✨ An AI-powered CLI & Web tool that automatically explains codebases in plain English.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ExplainHub/CodeNarrator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bin": {
+    "codenarrator": "./bin/cli.js"
+  },
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/ExplainHub/CodeNarrator/issues"
+  },
+  "homepage": "https://github.com/ExplainHub/CodeNarrator#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "chalk": "^5.4.1",
+    "commander": "^14.0.0",
+    "dotenv": "^17.0.1",
+    "fs-extra": "^11.3.0",
+    "glob": "^10.3.10",
+    "ora": "^8.2.0"
+  }
+}
