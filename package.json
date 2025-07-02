@@ -1,0 +1,46 @@
+{
+  "name": "@codemaverick-143/codenarrator",
+  "version": "1.0.0",
+  "description": "✨ AI-powered CLI tool that explains entire codebases in plain English using Gemini or OpenAI.",
+  "main": "bin/cli.js",
+  "bin": {
+    "codenarrator": "./bin/cli.js"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node ./bin/cli.js",
+    "test": "echo \"No test script defined. Use CLI: 'codenarrator ./src --output ./docs'\" && exit 0"
+  },
+  "keywords": [
+    "cli",
+    "ai",
+    "gemini",
+    "openai",
+    "developer-tools",
+    "documentation",
+    "codebase",
+    "code-explainer",
+    "code-analysis",
+    "code-narration",
+    "explainhub"
+  ],
+  "author": "Arpit Sarang <nexawebs.tech@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ExplainHub/CodeNarrator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ExplainHub/CodeNarrator/issues"
+  },
+  "homepage": "https://github.com/ExplainHub/CodeNarrator#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "chalk": "^5.4.1",
+    "commander": "^14.0.0",
+    "dotenv": "^17.0.1",
+    "fs-extra": "^11.3.0",
+    "glob": "^10.3.10",
+    "ora": "^8.2.0"
+  }
+}
