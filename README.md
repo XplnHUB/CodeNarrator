@@ -1,10 +1,10 @@
-# 🧠 CodeNarrator – Understand Any Codebase Instantly
+# CodeNarrator – Understand Any Codebase Instantly
 
-> ✨ An AI-powered CLI & Web tool that automatically explains codebases in plain English.
+> An AI-powered CLI & Web tool that automatically explains codebases in plain English.
 
 ---
 
-## 📌 Vision
+## Vision
 
 **CodeNarrator** aims to bridge the gap between complex code and developer understanding. Whether you're a beginner exploring a new open-source repo, a maintainer reviewing a PR, or an engineer returning to your own spaghetti code — CodeNarrator helps you understand any codebase faster, smarter, and with less frustration.
 
@@ -12,19 +12,19 @@ We believe **every developer deserves a code buddy** that makes codebases readab
 
 ---
 
-## 🚀 Key Features
+##  Key Features
 
-- 🧠 **Explain Any Codebase** – Analyze entire folders and files using AI
-- 🖥️ **CLI Tool** – Run in terminal with simple commands
-- 📁 **Recursive File Scanner** – Auto-detect `.js`, `.py`, `.ts`, `.java`, etc.
-- 📜 **Markdown Output** – Generate `.md` docs per file or entire summary
-- 🤖 **AI-Powered** – Uses GPT-4 (or 3.5) to generate clear, structured explanations
-- 🔄 **GitHub PR Integration** *(coming soon)* – Auto-summarize new PR changes
-- 🧩 **VS Code Plugin** *(planned)* – Hover to see explanations inside the editor
+- **Explain Any Codebase** – Analyze entire folders and files using AI
+- **CLI Tool** – Run in terminal with simple commands
+- **Recursive File Scanner** – Auto-detect `.js`, `.py`, `.ts`, `.java`, etc.
+- **Markdown Output** – Generate `.md` docs per file or entire summary
+- **AI-Powered** – Uses GPT-4 (or 3.5) to generate clear, structured explanations
+- **GitHub PR Integration** *(coming soon)* – Auto-summarize new PR changes
+- **VS Code Plugin** *(planned)* – Hover to see explanations inside the editor
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 
 | Layer          | Tech Used                     |
 |----------------|-------------------------------|
@@ -37,7 +37,7 @@ We believe **every developer deserves a code buddy** that makes codebases readab
 
 ---
 
-## 🏗️ Project Architecture
+## Project Architecture
 
 ```
 
@@ -85,7 +85,7 @@ codenarrator ./my-project --output=./docs --model=gemini-pro
 
 ---
 
-## 🧪 Sample Output
+## Sample Output
 
 ``
 📄 File: utils/logger.js
@@ -100,16 +100,16 @@ This file provides logging utilities for the application, including info and err
 ### Notes
 Uses `chalk` for colorized console output.
 
-## 📈 Use Cases
+## Use Cases
 
-* 👨‍💻 Understand open-source codebases faster
-* 🧑‍🏫 Help students learn unfamiliar projects
-* 🧪 Assist reviewers during PR reviews
-* 🧠 Onboard new team members with auto-generated code docs
+* Understand open-source codebases faster
+* Help students learn unfamiliar projects
+* Assist reviewers during PR reviews
+* Onboard new team members with auto-generated code docs
 
 ---
 
-## 📦 Roadmap
+## Roadmap
 
 | Phase   | Feature                                          |
 | ------- | ------------------------------------------------ |
@@ -122,7 +122,7 @@ Uses `chalk` for colorized console output.
 
 ---
 
-## 🔐 Security Note
+## Security Note
 
 * Your code is sent to OpenAI servers for analysis.
 * Never upload sensitive or private code unless self-hosted.
@@ -130,7 +130,7 @@ Uses `chalk` for colorized console output.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from all developers!
 
@@ -146,7 +146,7 @@ git commit -m "Add: your feature"
 
 ---
 
-## 📜 License
+## License
 
 MIT License — free to use, modify, and share.
 
