@@ -1,0 +1,5 @@
+.env
+*.md
+node_modules/
+docs/
+src/test-models.js

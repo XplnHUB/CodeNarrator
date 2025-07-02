@@ -1,22 +1,35 @@
 {
-  "name": "codenarrator",
+  "name": "@codemaverick-143/codenarrator",
   "version": "1.0.0",
-  "description": "> ✨ An AI-powered CLI & Web tool that automatically explains codebases in plain English.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ExplainHub/CodeNarrator.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "✨ AI-powered CLI tool that explains entire codebases in plain English using Gemini or OpenAI.",
+  "main": "bin/cli.js",
   "bin": {
     "codenarrator": "./bin/cli.js"
   },
   "type": "module",
+  "scripts": {
+    "start": "node ./bin/cli.js",
+    "test": "echo \"No test script defined. Use CLI: 'codenarrator ./src --output ./docs'\" && exit 0"
+  },
+  "keywords": [
+    "cli",
+    "ai",
+    "gemini",
+    "openai",
+    "developer-tools",
+    "documentation",
+    "codebase",
+    "code-explainer",
+    "code-analysis",
+    "code-narration",
+    "explainhub"
+  ],
+  "author": "Arpit Sarang <nexawebs.tech@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ExplainHub/CodeNarrator.git"
+  },
   "bugs": {
     "url": "https://github.com/ExplainHub/CodeNarrator/issues"
   },
