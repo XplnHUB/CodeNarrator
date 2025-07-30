@@ -26,20 +26,21 @@ We believe every developer deserves a tool that makes codebases more readable an
 
 ## Tech Stack
 
-| Layer              | Technologies Used                  |
-|--------------------|------------------------------------|
-| CLI Tool           | Node.js, Commander.js, Chalk       |
-| AI Integration     | Gemini API (via Google SDK)        |
-| File Scanning      | fs, glob                           |
-| Markdown Generation| Markdown, fs-extra                 |
-| Web UI (Planned)   | React.js, Tailwind CSS             |
-| Automation (Planned)| GitHub Actions, Pre-push Hooks    |
+| Layer               | Technologies Used                  |
+|---------------------|------------------------------------|
+| CLI Tool            | Node.js, Commander.js, Chalk       |
+| AI Integration      | Gemini API (via Google SDK)        |
+| File Scanning       | fs, glob                           |
+| Markdown Generation | Markdown, fs-extra                 |
+| Web UI (Planned)    | React.js, Tailwind CSS             |
+| Automation (Planned)| GitHub Actions, Pre-push Hooks     |
 
 ---
 
 ## Project Structure
 
 ```
+
 CodeNarrator/
 ├── bin/
 │   └── cli.js                # CLI entry point
@@ -52,7 +53,8 @@ CodeNarrator/
 ├── .env                      # (Optional) Your Gemini API key
 ├── README.md
 ├── package.json
-```
+
+````
 
 ---
 
@@ -63,7 +65,7 @@ CodeNarrator/
 ```bash
 git clone https://github.com/your-username/CodeNarrator.git
 cd CodeNarrator
-```
+````
 
 ### 2. Install dependencies
 
@@ -77,7 +79,7 @@ npm install
 echo "GEMINI_API_KEY=your-key" > .env
 ```
 
-> Note: If no `.env` is found, CodeNarrator uses a built-in fallback key.
+Note: If no `.env` is found, CodeNarrator uses a built-in fallback key.
 
 ### 4. Link CLI globally
 
@@ -115,31 +117,31 @@ Uses 'chalk' for styled terminal output.
 
 ## Use Cases
 
-- Understand unfamiliar open-source projects
-- Speed up PR reviews with inline documentation
-- Assist students in grasping legacy or complex code
-- Help new team members onboard quickly
+* Understand unfamiliar open-source projects
+* Speed up PR reviews with inline documentation
+* Assist students in grasping legacy or complex code
+* Help new team members onboard quickly
 
 ---
 
 ## Roadmap
 
-| Version | Feature                                          |
-|---------|--------------------------------------------------|
-| 1.0     | CLI with basic AI documentation output           |
-| 1.1     | GitHub PR summarizer integration (planned)       |
-| 1.2     | Multi-language support: JS, Python, etc. (planned)|
-| 1.3     | Web UI for drag-and-drop code analysis (planned) |
-| 2.0     | VS Code extension with inline explanations        |
-| 2.1     | Team dashboard, history, authentication (planned)|
+| Version | Feature                                            |
+| ------- | -------------------------------------------------- |
+| 1.0     | CLI with basic AI documentation output             |
+| 1.1     | GitHub PR summarizer integration (planned)         |
+| 1.2     | Multi-language support: JS, Python, etc. (planned) |
+| 1.3     | Web UI for drag-and-drop code analysis (planned)   |
+| 2.0     | VS Code extension with inline explanations         |
+| 2.1     | Team dashboard, history, authentication (planned)  |
 
 ---
 
 ## Security Note
 
-- Your code is sent to Gemini servers for analysis unless self-hosted.
-- Avoid analyzing confidential or proprietary files.
-- Configuration files like `.env` are excluded from analysis.
+* Your code is sent to Gemini servers for analysis unless self-hosted.
+* Avoid analyzing confidential or proprietary files.
+* Configuration files like `.env` are excluded from analysis.
 
 ---
 
@@ -147,9 +149,9 @@ Uses 'chalk' for styled terminal output.
 
 We welcome contributions from all developers.
 
-- Open issues and feature suggestions
-- Participate in [GitHub Discussions](https://github.com/your-username/CodeNarrator/discussions)
-- Look for `good first issue` tags to get started
+* Open issues and feature suggestions
+* Participate in [GitHub Discussions](https://github.com/your-username/CodeNarrator/discussions)
+* Look for `good first issue` tags to get started
 
 ```bash
 git checkout -b your-feature-branch
@@ -164,4 +166,3 @@ git commit -m "Add: your feature"
 CodeNarrator is licensed under the MIT License.
 You are free to use, modify, and distribute it.
 
----
