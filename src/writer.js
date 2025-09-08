@@ -16,12 +16,12 @@ export async function writeMarkdown(filePath, content, outputDir) {
   try {
     // Create a safe filename using the relative path from project root
     const relativePath = path.relative(process.cwd(), filePath);
-    const safeName = relativePath
+    const safeName = path.normalize( // Normalize path seperators according to OS
+      relativePath
       .replace(/^[\\/]/, '') // Remove leading slashes
       .replace(/[\\/:*?"<>|]/g, '-') // Replace invalid filename characters with dashes
       .replace(/\.[^/.]+$/, '') // Remove extension
-      .replace(/\\/g, '/') // Normalize path separators
-      .toLowerCase();
+      ).toLowerCase();
     
     const outputPath = path.join(outputDir, `${safeName}.md`);
     
