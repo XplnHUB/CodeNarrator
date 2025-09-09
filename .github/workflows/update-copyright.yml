@@ -1,0 +1,32 @@
+name: Update Copyright Year
+
+on:
+  schedule:
+    - cron: '0 0 1 1 *'  # Runs at 00:00 UTC on January 1st every year
+  workflow_dispatch:  # Allows manual triggering from GitHub UI
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update copyright year in LICENSE
+        run: |
+          YEAR=$(date +%Y)
+          sed -i "s/Copyright (c) [0-9]\{4\}/Copyright (c) $YEAR/" LICENSE
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add LICENSE
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update copyright year to $(date +%Y)"
+            git push
+          fi
