@@ -1,7 +1,7 @@
 {
   "name": "@codemaverick-143/codenarrator",
   "version": "1.0.0",
-  "description": "✨ AI-powered CLI tool that explains entire codebases in plain English using Gemini or OpenAI.",
+  "description": "AI-powered CLI tool that explains entire codebases in plain English using Gemini or OpenAI.",
   "main": "bin/cli.js",
   "bin": {
     "codenarrator": "./bin/cli.js"
