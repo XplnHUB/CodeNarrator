@@ -46,7 +46,7 @@ async function main() {
     .action(async (pathArg, options) => {
       const config = loadLocalConfig() || {};
       try {
-        console.log(`🚀 Starting CodeNarrator v${version}`);
+        console.log(`Starting CodeNarrator v${version}`);
         
         // Get values from CLI options, then config, then defaults
         const inputPath = pathArg || config?.input;
@@ -71,16 +71,16 @@ async function main() {
         console.log(`📁 Input directory: ${absolutePath}`);
         console.log(`📄 Output directory: ${absoluteOutput}`);
         console.log(`🤖 Using model: ${model}`);
-        console.log(verbose ? '🔍 Verbose mode: ON' : '🔇 Verbose mode: OFF');
+        console.log(verbose ? 'Verbose mode: ON' : 'Verbose mode: OFF');
         
         // Add a blank line before processing starts
         if (verbose) {
-          console.log('\n🚀 Starting documentation generation...\n');
+          console.log('\n Starting documentation generation...\n');
         }
 
         // Validate model
         if (model !== 'gemini') {
-          console.warn('⚠️  Only the Gemini model is currently supported');
+          console.warn(' Only the Gemini model is currently supported');
         }
 
         // Start analysis
