@@ -69,14 +69,14 @@ export async function analyzeCodebase(folderPath, options = {}) {
     const pattern = `${folderPath}/**/*.+(${supportedExtensions.join('|')})`;
 
     if (options.verbose) {
-      console.log(`🔍 Searching for supported files: ${pattern}`);
+      console.log(`Searching for supported files: ${pattern}`);
     }
 
     // Get all matching files (ignoring specified folders)
     const files = await glob(pattern, { nodir: true, ignore: excludeFolders });
 
     if (files.length === 0) {
-      console.warn('⚠️  No supported files found in the specified directory');
+      console.warn(' No supported files found in the specified directory');
       if (options.verbose) {
         console.log('  - Make sure the path contains source files');
         console.log(`  - Current working directory: ${process.cwd()}`);
@@ -84,7 +84,7 @@ export async function analyzeCodebase(folderPath, options = {}) {
       return;
     }
 
-    console.log(`📂 Found ${files.length} source files to process...`);
+    console.log(` Found ${files.length} source files to process...`);
 
     if (options.verbose) {
       console.log('  Previewing first few files:');
@@ -107,7 +107,7 @@ export async function analyzeCodebase(folderPath, options = {}) {
         // Log file being processed
         if (options.verbose) {
           console.log(`\n${progress} 📄 Processing: ${relativePath}`);
-          console.log(`   📍 Full path: ${path.resolve(file)}`);
+          console.log(`   Full path: ${path.resolve(file)}`);
         } else {
           process.stdout.write(`\r${progress} Processing: ${relativePath}...`);
         }
@@ -134,13 +134,13 @@ ${fileContent}`;
         const outputPath = await writeMarkdown(file, documentation, options.output);
 
         if (options.verbose) {
-          console.log(`   ✅ Documentation saved at: ${path.relative(process.cwd(), outputPath)}`);
+          console.log(`  Documentation saved at: ${path.relative(process.cwd(), outputPath)}`);
         }
 
         successCount++;
       } catch (error) {
         errorCount++;
-        const errorMsg = `❌ Error processing ${relativePath}: ${error.message}`;
+        const errorMsg = ` Error processing ${relativePath}: ${error.message}`;
         if (options.verbose) {
           console.error(`\n${' '.repeat(progress.length + 1)}${errorMsg}`);
           console.error('   Stack:', error.stack?.split('\n')[1]?.trim() || 'No stack trace');
@@ -156,15 +156,15 @@ ${fileContent}`;
     }
 
     // Final summary
-    console.log(`\n📊 Documentation generation complete!`);
-    console.log(`✅ ${successCount} files successfully documented`);
+    console.log(`\n  Documentation generation complete!`);
+    console.log(` ${successCount} files successfully documented`);
     if (errorCount > 0) {
-      console.warn(`⚠️  ${errorCount} files failed (see above for details)`);
+      console.warn(` ${errorCount} files failed (see above for details)`);
     }
-    console.log(`📂 Output directory: ${path.resolve(options.output)}`);
+    console.log(` Output directory: ${path.resolve(options.output)}`);
   } catch (error) {
     // Catch and rethrow unexpected errors
-    console.error('\n❌ Analysis failed:', error.message);
+    console.error('\n Analysis failed:', error.message);
     if (options.verbose) {
       console.error('Stack:', error.stack);
     }
