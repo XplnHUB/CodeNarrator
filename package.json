@@ -9,7 +9,7 @@
   "type": "module",
   "scripts": {
     "start": "node ./bin/cli.js",
-    "test": "echo \"No test script defined. Use CLI: 'codenarrator ./src --output ./docs'\" && exit 0"
+    "test": "node test-models.js"
   },
   "keywords": [
     "cli",
