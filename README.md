@@ -1,6 +1,6 @@
 # CodeNarrator – Understand Any Codebase Instantly
 
-> An AI-powered CLI & Web tool that automatically explains codebases in plain English.
+> An AI-powered CLI & Web tool that automatically explains codebases in plain English..
 
 ---
 
