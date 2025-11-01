@@ -4,6 +4,9 @@ import { glob } from 'glob';
 import { callGemini } from './aiEngine.js';
 import { writeMarkdown } from './writer.js';
 
+// Maximum file size to process (200KB)
+const MAX_FILE_SIZE = 200 * 1024;
+
 /**
  * Supported file extensions for multi-language documentation generation
  * Includes JavaScript, TypeScript, Python, Go, C/C++, Java, Kotlin, Ruby, Rust,
@@ -114,12 +117,25 @@ export async function analyzeCodebase(folderPath, options = {}) {
       try {
         // Log file being processed
         if (options.verbose) {
-          console.log(`\n${progress} 📄 Processing: ${relativePath}`);
+          console.log(`\n${progress} Processing: ${relativePath}`);
           console.log(`   Full path: ${path.resolve(file)}`);
         } else {
           process.stdout.write(`\r${progress} Processing: ${relativePath}...`);
         }
 
+        // Get file stats
+        const stats = fs.statSync(file);
+        
+        // Skip files that are too large
+        if (stats.size > MAX_FILE_SIZE) {
+          if (options.verbose) {
+            console.warn(`  Skipping large file (${Math.round(stats.size / 1024)}KB > ${MAX_FILE_SIZE / 1024}KB): ${relativePath}`);
+          } else {
+            console.warn(`\n${progress} Skipping large file: ${relativePath} (${Math.round(stats.size / 1024)}KB)`);
+          }
+          continue;
+        }
+        
         // Read file content
         const fileContent = fs.readFileSync(file, 'utf8');
         const fileExt = path.extname(file).slice(1).toUpperCase();

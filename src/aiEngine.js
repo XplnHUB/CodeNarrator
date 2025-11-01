@@ -1,25 +1,66 @@
 // @ts-check
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Read API key from environment; do not require a .env file here.
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  throw new Error(
-    "GEMINI_API_KEY is not set. Provide it via environment or a .env loaded by the CLI."
-  );
-}
-
-// Initialize the Google Generative AI client
-const genAI = new GoogleGenerativeAI(apiKey);
-
 // Model configuration - using the latest stable model
 const MODEL_NAME = "gemini-2.5-flash";
 
-// Log configuration in verbose mode only
-if (process.env.VERBOSE) {
-  console.log("🔧 Gemini AI Configuration:");
-  console.log(`- Model: ${MODEL_NAME}`);
-  console.log(`- API Key: ${apiKey ? "Present" : "Missing"}`);
+// Cache for the initialized client and model
+/** @type {GoogleGenerativeAI|null} */
+let genAI = null;
+/** @type {import('@google/generative-ai').GenerativeModel|null} */
+let model = null;
+
+/**
+ * Gets or initializes the Gemini client
+ * @returns {GoogleGenerativeAI} The initialized client
+ * @throws {Error} If the API key is missing
+ */
+function getClient() {
+  if (genAI) return genAI;
+  
+  // Read API key from environment
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "GEMINI_API_KEY is not set. Provide it via environment or a .env loaded by the CLI."
+    );
+  }
+
+  // Initialize the Google Generative AI client
+  genAI = new GoogleGenerativeAI(apiKey);
+  
+  // Log configuration in verbose mode only
+  if (process.env.VERBOSE) {
+    console.log("Gemini AI Configuration:");
+    console.log(`- Model: ${MODEL_NAME}`);
+    console.log(`- API Key: ${apiKey ? "Present" : "Missing"}`);
+  }
+  
+  return genAI;
+}
+
+/**
+ * Gets or initializes the Gemini model with configuration
+ * @returns {import('@google/generative-ai').GenerativeModel} The configured model
+ */
+function getModel() {
+  if (model) return model;
+  
+  // Get the Gemini client
+  const client = getClient();
+  
+  // Get the Gemini Pro model with generation config
+  model = client.getGenerativeModel({
+    model: MODEL_NAME,
+    generationConfig: {
+      temperature: 0.7,
+      topP: 0.95,
+      topK: 40,
+      maxOutputTokens: 2048,
+    },
+  });
+  
+  return model;
 }
 
 /**
@@ -29,9 +70,6 @@ if (process.env.VERBOSE) {
  * @throws {Error} If the API key is missing or the request fails
  */
 export async function callGemini(prompt) {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY is not set in environment variables");
-  }
 
   if (typeof prompt !== "string" || !prompt.trim()) {
     throw new Error("Prompt must be a non-empty string");
@@ -42,16 +80,8 @@ export async function callGemini(prompt) {
       console.log(`Using model: ${MODEL_NAME}`);
     }
 
-    // Get the Gemini Pro model with generation config
-    const model = genAI.getGenerativeModel({
-      model: MODEL_NAME,
-      generationConfig: {
-        temperature: 0.7,
-        topP: 0.95,
-        topK: 40,
-        maxOutputTokens: 2048,
-      },
-    });
+    // Get the model (initializes if needed)
+    const modelInstance = getModel();
 
     // Generate content
     if (process.env.VERBOSE) {
@@ -61,7 +91,7 @@ export async function callGemini(prompt) {
       );
     }
 
-    const result = await model.generateContent({
+    const result = await modelInstance.generateContent({
       contents: [{ role: "user", parts: [{ text: prompt }] }],
     });
 
@@ -118,8 +148,8 @@ export async function listAvailableModels() {
     console.log(`Testing with model: ${MODEL_NAME}`);
 
     // Test if we can use the model
-    const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-    await model.generateContent({
+    const modelInstance = getModel();
+    await modelInstance.generateContent({
       contents: [{ role: "user", parts: [{ text: "Hello" }] }],
     });
 
