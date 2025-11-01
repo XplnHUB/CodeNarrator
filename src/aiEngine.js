@@ -1,46 +1,13 @@
 // @ts-check
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
 
-// Configure dotenv to load from the project root
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-// Get the project root by going up one level from src directory
-const projectRoot = path.resolve(__dirname, "..");
-const envPath = path.join(projectRoot, ".env");
-
-console.log("🔍 Looking for .env file at:", envPath);
-
-// Debug: Check if .env file exists
-const fs = await import("fs");
-if (!fs.existsSync(envPath)) {
-  console.error("❌ Error: .env file not found at:", envPath);
-  console.log("Please create a .env file in your project root with:");
-  console.log("GEMINI_API_KEY=your_actual_api_key_here");
-  process.exit(1);
-}
-
-// Load environment variables
-try {
-  dotenv.config({ path: envPath });
-  console.log("Loaded .env file from:", envPath);
-} catch (error) {
-  console.error("Error loading .env file:", error.message);
-  process.exit(1);
-}
-
-// Get and validate API key
+// Read API key from environment; do not require a .env file here.
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
-  console.error("GEMINI_API_KEY is not set in .env file");
-  console.log("Please add this line to your .env file:");
-  console.log("GEMINI_API_KEY=your_actual_api_key_here");
-  process.exit(1);
+  throw new Error(
+    "GEMINI_API_KEY is not set. Provide it via environment or a .env loaded by the CLI."
+  );
 }
-
-console.log("Found GEMINI_API_KEY in .env file");
 
 // Initialize the Google Generative AI client
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -48,10 +15,12 @@ const genAI = new GoogleGenerativeAI(apiKey);
 // Model configuration - using the latest stable model
 const MODEL_NAME = "gemini-2.5-flash";
 
-// Log configuration for debugging
-console.log("🔧 Gemini AI Configuration:");
-console.log(`- Model: ${MODEL_NAME}`);
-console.log(`- API Key: ${apiKey ? "Present" : "Missing"}`);
+// Log configuration in verbose mode only
+if (process.env.VERBOSE) {
+  console.log("🔧 Gemini AI Configuration:");
+  console.log(`- Model: ${MODEL_NAME}`);
+  console.log(`- API Key: ${apiKey ? "Present" : "Missing"}`);
+}
 
 /**
  * Generates content using the Gemini Pro model
@@ -69,7 +38,9 @@ export async function callGemini(prompt) {
   }
 
   try {
-    console.log(`Using model: ${MODEL_NAME}`);
+    if (process.env.VERBOSE) {
+      console.log(`Using model: ${MODEL_NAME}`);
+    }
 
     // Get the Gemini Pro model with generation config
     const model = genAI.getGenerativeModel({
@@ -109,26 +80,35 @@ export async function callGemini(prompt) {
   } catch (error) {
     console.error("Error calling Gemini API:");
 
-    // Provide more detailed error information
+    // Provide more detailed error information (handle unknown error type safely)
     let errorMessage = "Failed to generate content";
-    if (error.response) {
-      errorMessage += `: ${JSON.stringify(error.response.data, null, 2)}`;
-    } else if (error.message) {
-      errorMessage += `: ${error.message}`;
+    /** @type {any} */
+    const e = /** @type {any} */ (error);
+
+    if (
+      e &&
+      typeof e === "object" &&
+      "response" in e &&
+      e.response &&
+      typeof e.response === "object" &&
+      "data" in e.response
+    ) {
+      errorMessage += `: ${JSON.stringify(e.response.data, null, 2)}`;
+    } else if (e && typeof e === "object" && "message" in e && typeof e.message === "string") {
+      errorMessage += `: ${e.message}`;
+    } else {
+      errorMessage += `: ${String(error)}`;
     }
 
-    if (error.stack) {
-      console.error("Stack trace:", error.stack);
+    if (e && typeof e === "object" && "stack" in e && typeof e.stack === "string") {
+      console.error("Stack trace:", e.stack);
     }
 
     throw new Error(errorMessage);
   }
 }
 
-/**
- * Lists all available models for the API key
- * @returns {Promise<Array>} List of available models
- */
+
 export async function listAvailableModels() {
   try {
     console.log("Fetching available models...");
@@ -146,7 +126,10 @@ export async function listAvailableModels() {
     console.log(`Successfully connected to model: ${MODEL_NAME}`);
     return [{ name: MODEL_NAME }];
   } catch (error) {
-    console.error("Error testing model access:", error.message);
-    throw new Error(`Failed to access model: ${error.message}`);
+    /** @type {any} */
+    const e = /** @type {any} */ (error);
+    const msg = e && typeof e === "object" && "message" in e && typeof e.message === "string" ? e.message : String(error);
+    console.error("Error testing model access:", msg);
+    throw new Error(`Failed to access model: ${msg}`);
   }
 }

@@ -28,7 +28,7 @@ const supportedExtensions = [
   'css', 'scss', 'sass',             // CSS / Sass
   'ejs', 'hbs', 'mustache',          // Template engines
   'json', 'yaml', 'yml',             // Config formats
-  'md', 'toml', 'ini'                // Docs / config files
+  'toml', 'ini'                      // Docs / config files (exclude md to avoid re-scan)
 ];
 
 // Common directories to ignore (improve performance and avoid useless files)
@@ -72,8 +72,16 @@ export async function analyzeCodebase(folderPath, options = {}) {
       console.log(`Searching for supported files: ${pattern}`);
     }
 
-    // Get all matching files (ignoring specified folders)
-    const files = await glob(pattern, { nodir: true, ignore: excludeFolders });
+    // Build dynamic ignore list to exclude output directory as well
+    const outputDirAbs = path.resolve(options.output);
+    const dynamicIgnore = [
+      ...excludeFolders,
+      `${outputDirAbs.replace(/\\/g, '/')}/**`,
+      `${path.relative(folderPath, outputDirAbs).replace(/\\/g, '/')}/**`,
+    ];
+
+    // Get all matching files (ignoring specified folders and output dir)
+    const files = await glob(pattern, { nodir: true, ignore: dynamicIgnore });
 
     if (files.length === 0) {
       console.warn(' No supported files found in the specified directory');

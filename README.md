@@ -72,13 +72,17 @@ cd CodeNarrator
 npm install
 ```
 
-### 3. (Optional) Add Gemini API Key to `.env`
+### 3. Add Gemini API Key
 
 ```bash
 echo "GEMINI_API_KEY=your-key" > .env
 ```
 
-Note: If no `.env` is found, CodeNarrator uses a built-in fallback key.
+Alternatively, you can export it in your shell environment (recommended for global installs):
+
+```bash
+export GEMINI_API_KEY=your-key
+```
 
 ### 4. Link CLI globally
 
