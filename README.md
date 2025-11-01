@@ -20,7 +20,6 @@ We believe every developer deserves a tool that makes codebases more readable an
 - Outputs structured Markdown documentation
 - Powered by Gemini or GPT-based AI models
 - Planned GitHub PR integration to summarize changes
-- VS Code plugin (planned)
 
 ---
 
