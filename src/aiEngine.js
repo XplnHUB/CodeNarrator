@@ -1,57 +1,67 @@
 // @ts-check
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
-
-// Configure dotenv to load from the project root
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-// Get the project root by going up one level from src directory
-const projectRoot = path.resolve(__dirname, "..");
-const envPath = path.join(projectRoot, ".env");
-
-console.log("🔍 Looking for .env file at:", envPath);
-
-// Debug: Check if .env file exists
-const fs = await import("fs");
-if (!fs.existsSync(envPath)) {
-  console.error("❌ Error: .env file not found at:", envPath);
-  console.log("Please create a .env file in your project root with:");
-  console.log("GEMINI_API_KEY=your_actual_api_key_here");
-  process.exit(1);
-}
-
-// Load environment variables
-try {
-  dotenv.config({ path: envPath });
-  console.log("Loaded .env file from:", envPath);
-} catch (error) {
-  console.error("Error loading .env file:", error.message);
-  process.exit(1);
-}
-
-// Get and validate API key
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  console.error("GEMINI_API_KEY is not set in .env file");
-  console.log("Please add this line to your .env file:");
-  console.log("GEMINI_API_KEY=your_actual_api_key_here");
-  process.exit(1);
-}
-
-console.log("Found GEMINI_API_KEY in .env file");
-
-// Initialize the Google Generative AI client
-const genAI = new GoogleGenerativeAI(apiKey);
 
 // Model configuration - using the latest stable model
 const MODEL_NAME = "gemini-2.5-flash";
 
-// Log configuration for debugging
-console.log("🔧 Gemini AI Configuration:");
-console.log(`- Model: ${MODEL_NAME}`);
-console.log(`- API Key: ${apiKey ? "Present" : "Missing"}`);
+// Cache for the initialized client and model
+/** @type {GoogleGenerativeAI|null} */
+let genAI = null;
+/** @type {import('@google/generative-ai').GenerativeModel|null} */
+let model = null;
+
+/**
+ * Gets or initializes the Gemini client
+ * @returns {GoogleGenerativeAI} The initialized client
+ * @throws {Error} If the API key is missing
+ */
+function getClient() {
+  if (genAI) return genAI;
+  
+  // Read API key from environment
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "GEMINI_API_KEY is not set. Provide it via environment or a .env loaded by the CLI."
+    );
+  }
+
+  // Initialize the Google Generative AI client
+  genAI = new GoogleGenerativeAI(apiKey);
+  
+  // Log configuration in verbose mode only
+  if (process.env.VERBOSE) {
+    console.log("Gemini AI Configuration:");
+    console.log(`- Model: ${MODEL_NAME}`);
+    console.log(`- API Key: ${apiKey ? "Present" : "Missing"}`);
+  }
+  
+  return genAI;
+}
+
+/**
+ * Gets or initializes the Gemini model with configuration
+ * @returns {import('@google/generative-ai').GenerativeModel} The configured model
+ */
+function getModel() {
+  if (model) return model;
+  
+  // Get the Gemini client
+  const client = getClient();
+  
+  // Get the Gemini Pro model with generation config
+  model = client.getGenerativeModel({
+    model: MODEL_NAME,
+    generationConfig: {
+      temperature: 0.7,
+      topP: 0.95,
+      topK: 40,
+      maxOutputTokens: 2048,
+    },
+  });
+  
+  return model;
+}
 
 /**
  * Generates content using the Gemini Pro model
@@ -60,27 +70,18 @@ console.log(`- API Key: ${apiKey ? "Present" : "Missing"}`);
  * @throws {Error} If the API key is missing or the request fails
  */
 export async function callGemini(prompt) {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY is not set in environment variables");
-  }
 
   if (typeof prompt !== "string" || !prompt.trim()) {
     throw new Error("Prompt must be a non-empty string");
   }
 
   try {
-    console.log(`Using model: ${MODEL_NAME}`);
+    if (process.env.VERBOSE) {
+      console.log(`Using model: ${MODEL_NAME}`);
+    }
 
-    // Get the Gemini Pro model with generation config
-    const model = genAI.getGenerativeModel({
-      model: MODEL_NAME,
-      generationConfig: {
-        temperature: 0.7,
-        topP: 0.95,
-        topK: 40,
-        maxOutputTokens: 2048,
-      },
-    });
+    // Get the model (initializes if needed)
+    const modelInstance = getModel();
 
     // Generate content
     if (process.env.VERBOSE) {
@@ -90,7 +91,7 @@ export async function callGemini(prompt) {
       );
     }
 
-    const result = await model.generateContent({
+    const result = await modelInstance.generateContent({
       contents: [{ role: "user", parts: [{ text: prompt }] }],
     });
 
@@ -109,26 +110,35 @@ export async function callGemini(prompt) {
   } catch (error) {
     console.error("Error calling Gemini API:");
 
-    // Provide more detailed error information
+    // Provide more detailed error information (handle unknown error type safely)
     let errorMessage = "Failed to generate content";
-    if (error.response) {
-      errorMessage += `: ${JSON.stringify(error.response.data, null, 2)}`;
-    } else if (error.message) {
-      errorMessage += `: ${error.message}`;
+    /** @type {any} */
+    const e = /** @type {any} */ (error);
+
+    if (
+      e &&
+      typeof e === "object" &&
+      "response" in e &&
+      e.response &&
+      typeof e.response === "object" &&
+      "data" in e.response
+    ) {
+      errorMessage += `: ${JSON.stringify(e.response.data, null, 2)}`;
+    } else if (e && typeof e === "object" && "message" in e && typeof e.message === "string") {
+      errorMessage += `: ${e.message}`;
+    } else {
+      errorMessage += `: ${String(error)}`;
     }
 
-    if (error.stack) {
-      console.error("Stack trace:", error.stack);
+    if (e && typeof e === "object" && "stack" in e && typeof e.stack === "string") {
+      console.error("Stack trace:", e.stack);
     }
 
     throw new Error(errorMessage);
   }
 }
 
-/**
- * Lists all available models for the API key
- * @returns {Promise<Array>} List of available models
- */
+
 export async function listAvailableModels() {
   try {
     console.log("Fetching available models...");
@@ -138,15 +148,18 @@ export async function listAvailableModels() {
     console.log(`Testing with model: ${MODEL_NAME}`);
 
     // Test if we can use the model
-    const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-    await model.generateContent({
+    const modelInstance = getModel();
+    await modelInstance.generateContent({
       contents: [{ role: "user", parts: [{ text: "Hello" }] }],
     });
 
     console.log(`Successfully connected to model: ${MODEL_NAME}`);
     return [{ name: MODEL_NAME }];
   } catch (error) {
-    console.error("Error testing model access:", error.message);
-    throw new Error(`Failed to access model: ${error.message}`);
+    /** @type {any} */
+    const e = /** @type {any} */ (error);
+    const msg = e && typeof e === "object" && "message" in e && typeof e.message === "string" ? e.message : String(error);
+    console.error("Error testing model access:", msg);
+    throw new Error(`Failed to access model: ${msg}`);
   }
 }

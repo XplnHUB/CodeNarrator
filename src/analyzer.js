@@ -4,6 +4,9 @@ import { glob } from 'glob';
 import { callGemini } from './aiEngine.js';
 import { writeMarkdown } from './writer.js';
 
+// Maximum file size to process (200KB)
+const MAX_FILE_SIZE = 200 * 1024;
+
 /**
  * Supported file extensions for multi-language documentation generation
  * Includes JavaScript, TypeScript, Python, Go, C/C++, Java, Kotlin, Ruby, Rust,
@@ -28,7 +31,7 @@ const supportedExtensions = [
   'css', 'scss', 'sass',             // CSS / Sass
   'ejs', 'hbs', 'mustache',          // Template engines
   'json', 'yaml', 'yml',             // Config formats
-  'md', 'toml', 'ini'                // Docs / config files
+  'toml', 'ini'                      // Docs / config files (exclude md to avoid re-scan)
 ];
 
 // Common directories to ignore (improve performance and avoid useless files)
@@ -72,8 +75,16 @@ export async function analyzeCodebase(folderPath, options = {}) {
       console.log(`Searching for supported files: ${pattern}`);
     }
 
-    // Get all matching files (ignoring specified folders)
-    const files = await glob(pattern, { nodir: true, ignore: excludeFolders });
+    // Build dynamic ignore list to exclude output directory as well
+    const outputDirAbs = path.resolve(options.output);
+    const dynamicIgnore = [
+      ...excludeFolders,
+      `${outputDirAbs.replace(/\\/g, '/')}/**`,
+      `${path.relative(folderPath, outputDirAbs).replace(/\\/g, '/')}/**`,
+    ];
+
+    // Get all matching files (ignoring specified folders and output dir)
+    const files = await glob(pattern, { nodir: true, ignore: dynamicIgnore });
 
     if (files.length === 0) {
       console.warn(' No supported files found in the specified directory');
@@ -106,12 +117,25 @@ export async function analyzeCodebase(folderPath, options = {}) {
       try {
         // Log file being processed
         if (options.verbose) {
-          console.log(`\n${progress} 📄 Processing: ${relativePath}`);
+          console.log(`\n${progress} Processing: ${relativePath}`);
           console.log(`   Full path: ${path.resolve(file)}`);
         } else {
           process.stdout.write(`\r${progress} Processing: ${relativePath}...`);
         }
 
+        // Get file stats
+        const stats = fs.statSync(file);
+        
+        // Skip files that are too large
+        if (stats.size > MAX_FILE_SIZE) {
+          if (options.verbose) {
+            console.warn(`  Skipping large file (${Math.round(stats.size / 1024)}KB > ${MAX_FILE_SIZE / 1024}KB): ${relativePath}`);
+          } else {
+            console.warn(`\n${progress} Skipping large file: ${relativePath} (${Math.round(stats.size / 1024)}KB)`);
+          }
+          continue;
+        }
+        
         // Read file content
         const fileContent = fs.readFileSync(file, 'utf8');
         const fileExt = path.extname(file).slice(1).toUpperCase();

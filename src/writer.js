@@ -35,7 +35,7 @@ export async function writeMarkdown(filePath, content, outputDir) {
     await fs.writeFile(normalizedOutputPath, content, "utf-8");
 
     if (process.env.VERBOSE) {
-      console.log(`📄 Wrote documentation to: ${normalizedOutputPath}`);
+      console.log(`Wrote documentation to: ${normalizedOutputPath}`);
     }
 
     return normalizedOutputPath;

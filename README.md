@@ -1,4 +1,4 @@
-# CodeNarrator – Understand Any Codebase Instantly
+# CodeNarrator - Understand Any Codebase Instantly
 
 > An AI-powered CLI & Web tool that automatically explains codebases in plain English...
 
@@ -20,7 +20,6 @@ We believe every developer deserves a tool that makes codebases more readable an
 - Outputs structured Markdown documentation
 - Powered by Gemini or GPT-based AI models
 - Planned GitHub PR integration to summarize changes
-- VS Code plugin (planned)
 
 ---
 
@@ -40,21 +39,20 @@ We believe every developer deserves a tool that makes codebases more readable an
 ## Project Structure
 
 ```
-
 CodeNarrator/
-├── bin/
-│   └── cli.js                # CLI entry point
-├── src/
-│   ├── analyzer.js           # Scans code and sends to AI
-│   ├── aiEngine.js           # Communicates with AI API
-│   ├── writer.js             # Saves generated Markdown
-├── test-models.js            # Test script
-├── .codenarratorrc.json      # Optional config
-├── .env                      # (Optional) Your Gemini API key
-├── README.md
-├── package.json
+|-- bin/
+|   `-- cli.js                # CLI entry point
+|-- src/
+|   |-- analyzer.js           # Scans code and sends to AI (with file size limits)
+|   |-- aiEngine.js           # Lazy-loads Gemini client when needed
+|   `-- writer.js             # Saves generated Markdown
+|-- test-models.js            # Test script (skips gracefully if no API key)
+|-- .codenarratorrc.json      # Optional config
+|-- .env                      # Your Gemini API key (if using dotenv method)
+|-- README.md
+`-- package.json
 
-````
+```
 
 ---
 
@@ -73,13 +71,35 @@ cd CodeNarrator
 npm install
 ```
 
-### 3. (Optional) Add Gemini API Key to `.env`
+### 3. Add Gemini API Key (Required)
+
+**Option A:** Export in your shell environment (recommended, especially for global installs):
+
+```bash
+export GEMINI_API_KEY=your-key
+```
+
+**Option B:** Create a `.env` file in the project root:
 
 ```bash
 echo "GEMINI_API_KEY=your-key" > .env
 ```
 
-Note: If no `.env` is found, CodeNarrator uses a built-in fallback key.
+**Option C:** Run commands with inline environment variable:
+
+```bash
+GEMINI_API_KEY=your-key codenarrator ./src --output ./docs
+```
+
+**For testing:**
+
+```bash
+# Test API connectivity
+GEMINI_API_KEY=your-key npm test
+
+# Or with dotenv preload
+node -r dotenv/config test-models.js
+```
 
 ### 4. Link CLI globally
 
@@ -142,6 +162,7 @@ Uses 'chalk' for styled terminal output.
 * Your code is sent to Gemini servers for analysis unless self-hosted.
 * Avoid analyzing confidential or proprietary files.
 * Configuration files like `.env` are excluded from analysis.
+* Files larger than 200KB are automatically skipped to avoid excessive token usage.
 
 ---
 

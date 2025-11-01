@@ -20,10 +20,10 @@ function loadLocalConfig() {
   if (fs.existsSync(configPath)) {
     try {
       const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-      console.log("🛠️  Loaded config from .codenarratorrc.json");
+      console.log("Loaded config from .codenarratorrc.json");
       return config;
     } catch (err) {
-      console.error("⚠️ Failed to parse .codenarratorrc.json:", err.message);
+      console.error("Failed to parse .codenarratorrc.json:", err.message);
     }
   }
   return null;
@@ -64,7 +64,7 @@ async function main() {
 
         if (!inputPath) {
           console.error(
-            "❌ No input path provided. Use an argument or define `input` in .codenarratorrc.json"
+            "No input path provided. Use an argument or define `input` in .codenarratorrc.json"
           );
           process.exit(1);
         }
@@ -75,12 +75,12 @@ async function main() {
 
         if (verbose) {
           process.env.VERBOSE = "true";
-          console.log("🛠️  Loaded config from .codenarratorrc.json");
+          console.log("Loaded config from .codenarratorrc.json");
         }
 
-        console.log(`📁 Input directory: ${absolutePath}`);
-        console.log(`📄 Output directory: ${absoluteOutput}`);
-        console.log(`🤖 Using model: ${model}`);
+        console.log(`Input directory: ${absolutePath}`);
+        console.log(`Output directory: ${absoluteOutput}`);
+        console.log(`Using model: ${model}`);
         console.log(verbose ? "Verbose mode: ON" : "Verbose mode: OFF");
 
         // Add a blank line before processing starts
@@ -100,9 +100,9 @@ async function main() {
           verbose,
         });
 
-        console.log("✨ Documentation generation completed successfully!");
+        console.log("Documentation generation completed successfully!");
       } catch (error) {
-        console.error("❌ Error:", error.message);
+        console.error("Error:", error.message);
         if (options.verbose) {
           console.error(error.stack);
         }
