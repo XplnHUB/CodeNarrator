@@ -1,152 +1,173 @@
-# CodeNarrator - Project Report
+# CodeNarrator – Project Report
 
 ## Overview
 
-- **What it does**
-  - CLI tool that scans a codebase, sends file contents to Gemini, and writes per-file Markdown documentation.
-- **Core flow**
-  - `bin/cli.js` parses args and config -> calls `analyzeCodebase()`.
-  - `src/analyzer.js` finds files, builds prompts, calls `callGemini()`, and writes docs via `writeMarkdown()`.
-  - `src/aiEngine.js` integrates with `@google/generative-ai`.
-  - `src/writer.js` writes normalized Markdown file paths under the output directory.
+### Purpose
+
+**CodeNarrator** is a command-line tool that scans a codebase, sends source files to the Gemini API, and generates per-file Markdown documentation automatically.
+
+### Core Workflow
+
+1. **`bin/cli.js`** – Parses CLI arguments and configuration, then calls `analyzeCodebase()`.
+2. **`src/analyzer.js`** – Scans files, builds prompts, invokes `callGemini()`, and writes documentation using `writeMarkdown()`.
+3. **`src/aiEngine.js`** – Handles communication with the `@google/generative-ai` package.
+4. **`src/writer.js`** – Normalizes Markdown file paths and writes output files.
 
 ## Tech Stack
 
-- Node.js (ESM)
-- commander, chalk, ora (CLI UX)
-- glob, fs / fs-extra (file scanning and IO)
-- dotenv (env loading)
-- @google/generative-ai (Gemini API)
+* **Runtime:** Node.js (ESM)
+* **CLI Experience:** commander, chalk, ora
+* **File Operations:** glob, fs, fs-extra
+* **Configuration:** dotenv
+* **AI Integration:** @google/generative-ai (Gemini API)
 
-## Project Structure (key)
+## Project Structure (Key Files)
 
-- `bin/cli.js` – CLI entry, dotenv load, options, invokes analyzer.
-- `src/analyzer.js` – Scans files, prompts AI, writes docs, progress + summary.
-- `src/aiEngine.js` – Uses `@google/generative-ai`, reads `GEMINI_API_KEY` from environment, calls model `gemini-2.5-flash`.
-- `src/writer.js` – Normalizes filenames and writes markdown.
-- `test-models.js` – Connectivity test for Gemini and simple prompt.
+| File              | Description                                                                   |
+| ----------------- | ----------------------------------------------------------------------------- |
+| `bin/cli.js`      | CLI entry point. Loads dotenv, parses arguments, and invokes the analyzer.    |
+| `src/analyzer.js` | Main logic for scanning, prompting AI, writing docs, and summarizing results. |
+| `src/aiEngine.js` | Initializes and manages Gemini API clients using the environment key.         |
+| `src/writer.js`   | Handles path normalization and Markdown file creation.                        |
+| `test-models.js`  | Tests Gemini connectivity and basic prompt execution.                         |
 
-## How It Works (summary)
+## How It Works
 
-1. CLI resolves absolute input and output paths and validates model.
-2. Analyzer finds supported files (many extensions) using `glob` with some folder ignores.
-3. For each file, constructs a documentation prompt -> calls Gemini -> writes a Markdown file under the output directory mirroring the relative path.
-4. Provides a summary with success and failure counts.
+1. The CLI resolves absolute paths for input and output, validating the selected model.
+2. The analyzer searches for supported files (using `glob`) while ignoring certain folders.
+3. Each file’s content is sent to Gemini with a structured prompt, and its documentation is written to the output directory (mirroring its relative path).
+4. A summary reports successful and failed operations.
 
 ## How to Run
 
-- **Prerequisites**
-  - Node.js 18+ (ESM + top-level await used).
-  - A valid Gemini API key.
+### Prerequisites
 
-- **Setup**
-  ```bash
-  npm install
-  # Provide your Gemini API key in the environment (recommended):
-  export GEMINI_API_KEY=your_key
-  # Or create a .env in project root (see Notes below):
-  echo "GEMINI_API_KEY=your_key" > .env
-  ```
+* Node.js 18+ (uses ESM and top-level `await`)
+* A valid **Gemini API key**
 
-- **CLI usage**
-  ```bash
-  # Local run
-  npm start -- ./src --output ./docs --model gemini
+### Setup
 
-  # Or link globally
-  npm link
-  codenarrator ./src --output ./docs --model gemini
-  ```
+```bash
+npm install
+# Provide your API key
+export GEMINI_API_KEY=your_key
+# Or create a .env file
+echo "GEMINI_API_KEY=your_key" > .env
+```
 
-- **Connectivity test**
-  ```bash
-  npm test
-  ```
+### CLI Usage
 
-- **Notes**
-  - If you install globally, relying solely on a package-local `.env` will fail; ensure `GEMINI_API_KEY` is available in your shell environment.
+```bash
+# Local run
+npm start -- ./src --output ./docs --model gemini
+
+# Or link globally
+npm link
+codenarrator ./src --output ./docs --model gemini
+```
+
+### Connectivity Test
+
+```bash
+npm test
+```
+
+> **Note:** When installed globally, `.env` files in the package directory will not be read. Ensure `GEMINI_API_KEY` is available in your shell environment.
 
 ## Current Status
 
-- **Lazy initialization implemented** (`src/aiEngine.js`)
-  - The module now uses lazy initialization with `getClient()` and `getModel()` functions.
-  - API key is only checked when functions are called, not at import time.
-  - Client and model instances are cached for reuse.
+### Lazy Initialization (`src/aiEngine.js`)
 
-- **Test script improvements** (`test-models.js`)
-  - Now gracefully skips tests when `GEMINI_API_KEY` is missing instead of exiting with an error.
-  - Provides helpful guidance on how to set up the key.
-  - Working commands clearly documented:
-    - Inline env: `GEMINI_API_KEY=YOUR_KEY VERBOSE=1 npm test`
-    - With dotenv preload: `VERBOSE=1 node -r dotenv/config test-models.js`
+* Implemented `getClient()` and `getModel()` for on-demand setup.
+* The API key is validated only when needed, not at import time.
+* Client and model instances are cached for reuse.
 
-- **Analyzer safeguards implemented**
-  - File size limit (200KB) added to avoid sending large files to the API.
-  - `supportedExtensions` excludes `md` files.
-  - Output directory is dynamically ignored (absolute and relative paths), avoiding re-scan of generated docs.
+### Test Script Improvements (`test-models.js`)
 
-- **Dependencies**
-  - Versions are pinned to currently available releases (e.g., dotenv 16.4.5, chalk 5.3.0, commander 12.1.0, fs-extra 11.2.0).
-  - `engines.node >= 18` is specified in package.json.
+* Gracefully skips tests if `GEMINI_API_KEY` is missing.
+* Provides clear setup guidance.
+* Example commands:
 
-- **Documentation improved**
-  - README now clearly explains API key setup options with examples.
-  - Project structure description updated to reflect code changes.
-  - Security note added about file size limits.
+  ```bash
+  GEMINI_API_KEY=YOUR_KEY VERBOSE=1 npm test
+  VERBOSE=1 node -r dotenv/config test-models.js
+  ```
+
+### Analyzer Safeguards
+
+* Added **file size limit (200 KB)** to skip large files.
+* Automatically excludes Markdown files and the output directory (both absolute and relative).
+
+### Dependencies
+
+* Versions pinned for stability:
+  dotenv 16.4.5, chalk 5.3.0, commander 12.1.0, fs-extra 11.2.0.
+* `engines.node >= 18` enforced in `package.json`.
+
+### Documentation Updates
+
+* README expanded with clearer setup examples and API key notes.
+* Added a security reminder about file size and privacy.
 
 ## Future Improvements
 
-- **Analyzer enhancements**
-  - Add simple concurrency (e.g., process N files at a time) with basic retry/backoff on API errors.
-  - Implement a progress bar for better UX during processing.
+### Analyzer
 
-- **CLI UX**
-  - Validate that `input` and `output` are not nested in a way that causes re-scan of generated docs.
-  - Offer `--exclude` and `--include` patterns for more granular file selection.
-  - Provide a dry-run mode and a `--max-files` cap for testing.
+* Add simple concurrency (process multiple files simultaneously).
+* Introduce retry/backoff logic for transient API errors.
+* Include a visual progress bar for better UX.
 
-- **AI integration**
-  - Make model name configurable; keep a default but allow override with validation.
-  - Add structured prompt templates per language for better outputs.
-  - Consider adding OpenAI as an alternative model provider.
+### CLI UX
 
-- **Error handling**
-  - Add retry logic for API calls with exponential backoff.
-  - Improve error messages with more specific guidance.
+* Validate that input/output paths don’t overlap.
+* Support `--include` / `--exclude` patterns.
+* Add dry-run mode and `--max-files` limit.
 
-- **Performance**
-  - Implement batch processing to reduce API calls.
-  - Add caching for repeated analyses of the same files.
+### AI Integration
+
+* Make model name configurable and validated.
+* Add language-specific prompt templates.
+* Consider OpenAI as an optional provider.
+
+### Error Handling
+
+* Add exponential backoff and richer error reporting.
+
+### Performance
+
+* Support batch requests to minimize API calls.
+* Cache results for unchanged files.
 
 ## Implementation Checklist
 
-- [x] In `aiEngine.js`, lazy-init the client to avoid import-time throws; error clearly when used without `GEMINI_API_KEY`.
-- [x] Keep dotenv loading only in `bin/cli.js` (already true); document `node -r dotenv/config` for non-CLI scripts.
-- [x] Maintain analyzer ignores and `md` exclusion (already implemented).
-- [x] Add file size limits to analyzer.js to avoid processing large files.
-- [x] Keep dependency versions pinned and `engines.node` enforced.
-- [x] Clarify environment setup in README (no fallback key; env var is required).
-- [x] Update test-models.js to skip gracefully when API key is missing.
+* [x] Lazy initialization in `aiEngine.js`
+* [x] dotenv only in CLI entry (`bin/cli.js`)
+* [x] Analyzer ignores `.md` and output directories
+* [x] File size limit enforced
+* [x] Dependency versions pinned
+* [x] Environment setup clarified in README
+* [x] Test gracefully skips without API key
 
 ## Example Commands
 
 ```bash
-# Generate docs for this repo's src into ./docs
+# Generate documentation
 npm start -- ./src --output ./docs --model gemini
 
-# Global after linking
+# Global usage
 codenarrator ./src --output ./docs --model gemini
 
-# Run quick connectivity test
+# Quick API connectivity test
 npm test
 ```
 
 ## Risks & Considerations
 
-- Cost and privacy: Files are sent to Gemini; avoid sensitive code without controls.
-- Rate limits: Add retry/backoff and concurrency control if scaling to large repos.
-- Large files/binaries: Add size/type filters to avoid sending non-text blobs.
+* **Cost & Privacy:** Code is transmitted to Gemini; avoid sending sensitive files.
+* **Rate Limits:** Retry/backoff and concurrency controls needed for large repos.
+* **Binary/Large Files:** Continue filtering non-text or oversized files.
 
 ## Conclusion
 
-The project is now fully functional with robust error handling and user-friendly documentation. Key improvements include lazy initialization of the AI client, graceful handling of missing API keys, file size limits to prevent excessive token usage, and clear documentation for various usage scenarios. The codebase is now more maintainable, user-friendly, and ready for production use.
+**CodeNarrator** is now a stable, production-ready CLI tool.
+Major updates include lazy AI client initialization, robust error handling, size safeguards, and improved documentation. The system now offers a clean developer experience, efficient performance, and a foundation for future expansion with concurrency and provider flexibility.
