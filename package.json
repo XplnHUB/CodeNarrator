@@ -41,7 +41,7 @@
     "@google/generative-ai": "^0.24.1",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.2.3",
     "fs-extra": "^11.2.0",
     "glob": "^10.3.10",
     "ora": "^8.2.0"
