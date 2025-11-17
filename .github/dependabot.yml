@@ -1,8 +1,8 @@
 version: 2
 updates:
-  # 1. npm / yarn dependencies for CLI and core JS code
+  # 1. npm dependencies (root)
   - package-ecosystem: "npm"
-    directory: "/"      # root folder (since package.json is here) :contentReference[oaicite:2]{index=2}
+    directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 8
@@ -16,11 +16,8 @@ updates:
       - "CodeMaverick-143"
     assignees:
       - "CodeMaverick-143"
-    # You may want to automatically merge safe patches:
-    automerge: true
-    automerge-type: "branch"  # GitHub’s default branch merging via auto-merge
 
-  # 2. GitHub Actions workflows updates
+  # 2. GitHub Actions updates
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -30,7 +27,7 @@ updates:
       - "ci"
       - "workflow-updates"
 
-  # 3. Docker updates (if/when you add a Dockerfile)
+  # 3. Docker (optional for future)
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
