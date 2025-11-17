@@ -1,0 +1,41 @@
+version: 2
+updates:
+  # 1. npm / yarn dependencies for CLI and core JS code
+  - package-ecosystem: "npm"
+    directory: "/"      # root folder (since package.json is here) :contentReference[oaicite:2]{index=2}
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 8
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "auto-dep-update"
+    reviewers:
+      - "CodeMaverick-143"
+    assignees:
+      - "CodeMaverick-143"
+    # You may want to automatically merge safe patches:
+    automerge: true
+    automerge-type: "branch"  # GitHub’s default branch merging via auto-merge
+
+  # 2. GitHub Actions workflows updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 4
+    labels:
+      - "ci"
+      - "workflow-updates"
+
+  # 3. Docker updates (if/when you add a Dockerfile)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 2
+    labels:
+      - "docker"
+      - "base-image-updates"
